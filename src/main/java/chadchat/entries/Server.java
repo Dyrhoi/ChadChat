@@ -12,11 +12,11 @@ public class Server {
 
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost/chadchat";
+    static final String DB_URL = "jdbc:mysql://localhost/chadchat?serverTimezone=UTC&allowPublicKeyRetrieval=true";
 
     //  Database credentials
-    static final String USER = "youruser";
-    static final String PASS = "thepassword";
+    static final String USER = "chadchat";
+    static final String PASS = null;
 
     /**
      * This is purely a data base test. Given that you have created a
