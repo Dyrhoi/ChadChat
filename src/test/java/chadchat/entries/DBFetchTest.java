@@ -1,14 +1,16 @@
 package chadchat.entries;
 
 import chadchat.domain.User;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Server {
-    // The entry point of the ChatChad server
+import static org.junit.jupiter.api.Assertions.*;
+
+class DBFetchTest {
 
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -22,9 +24,11 @@ public class Server {
      * This is purely a data base test. Given that you have created a
      * users table in chatchad with an id and name.
      *
-     * @throws ClassNotFoundException
-     * @throws SQLException
+     * @throws ClassNotFoundException : If not found class
+     * @throws SQLException : If exception.
      */
+
+    @Test
     private static void dbTest() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
@@ -40,14 +44,4 @@ public class Server {
             }
         }
     }
-
-
-    public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        // Remove this soon
-        dbTest();
-    }
-
-
-
-
 }
