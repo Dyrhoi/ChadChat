@@ -11,13 +11,13 @@ public class Client {
     private final Scanner input;
 
     private final String identifierName;
+    private User user;
 
     public Client(Socket socket) throws IOException {
         this.socket = socket;
 
         this.output = new PrintWriter(socket.getOutputStream(), true);
         this.input = new Scanner(socket.getInputStream());
-
         this.identifierName = socket.getInetAddress().getHostAddress() + " : " + socket.getPort();
     }
 
@@ -31,5 +31,13 @@ public class Client {
 
     public String getIdentifierName() {
         return identifierName;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

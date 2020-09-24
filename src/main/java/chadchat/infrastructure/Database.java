@@ -1,17 +1,13 @@
-package chadchat.entries;
+package chadchat.infrastructure;
 
 import chadchat.domain.User;
-import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-class DBFetchTest {
-
+public class Database {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/chadchat?serverTimezone=UTC&allowPublicKeyRetrieval=true";
@@ -28,8 +24,7 @@ class DBFetchTest {
      * @throws SQLException : If exception.
      */
 
-    @Test
-    void dbTest() throws ClassNotFoundException, SQLException {
+    private static void dbTest() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
             var stmt = conn.createStatement();

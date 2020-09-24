@@ -7,7 +7,7 @@ import java.io.IOException;
 public class ServerEntry {
 
     public static void main(String[] args) {
-        int port = 2222;
+        int port = 2221;
         Server server = new Server(port);
         try {
             server.start();
