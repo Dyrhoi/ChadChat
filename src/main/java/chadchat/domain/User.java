@@ -1,7 +1,7 @@
 package chadchat.domain;
 
 public class User {
-    private final int id;
+    private int id; //final?
     private final String name;
 
     public User(int id, String name) {
@@ -11,6 +11,10 @@ public class User {
 
     public String getName() {
         return name;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override

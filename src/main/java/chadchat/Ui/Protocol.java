@@ -4,8 +4,9 @@ import chadchat.domain.Client;
 import chadchat.domain.Message;
 import chadchat.domain.Server;
 import chadchat.domain.User;
+import chadchat.infrastructure.Database;
 
-import java.io.IOException;
+import java.sql.SQLException;
 
 public class Protocol implements Runnable {
 
@@ -34,6 +35,8 @@ public class Protocol implements Runnable {
             if(line.startsWith("/user")){
                 client.getOutput().println("Skriv dit brugernavn: ");
                 String userName = client.getInput().nextLine();
+
+
                 this.client.setUser(new User(-1, userName));
                 continue;
             }
@@ -41,6 +44,7 @@ public class Protocol implements Runnable {
             System.out.println(client.getIdentifierName() + " issued: " + line);
 
             this.server.broadcast(this.client, message);
+
         }
     }
 }

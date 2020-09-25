@@ -1,10 +1,12 @@
 package chadchat.domain;
 
 import chadchat.Ui.Protocol;
+import chadchat.infrastructure.Database;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -20,6 +22,15 @@ public class Server {
         this.isRunning = true;
         this.clients = new ArrayList<>();
     }
+    /*public User saveUsertoDB(String name ) throws SQLException, ClassNotFoundException {
+        User user = new User(-1, name);
+       int iD = Database.saveDBUser(name);
+       user = Database.getUserfromDB(name);
+       user.
+
+
+        return user;
+ } */
 
     public void broadcast(Client client, Message message){
         for (Client loopedClient : this.clients) {
@@ -30,12 +41,12 @@ public class Server {
     }
 
     public void start() throws IOException {
-        System.out.println( " Starting server...");
+        System.out.println(" Starting server...");
 
         ServerSocket serverSocket = new ServerSocket(this.port);
         System.out.println("Server started on port: " + this.port);
 
-        while(this.isRunning) {
+        while (this.isRunning) {
             Socket socket = serverSocket.accept();
 
             Client client = new Client(socket);
@@ -67,6 +78,8 @@ public class Server {
 
 
         }
-
     }
-}
+
+
+        }
+

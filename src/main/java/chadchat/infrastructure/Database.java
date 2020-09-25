@@ -2,10 +2,7 @@ package chadchat.infrastructure;
 
 import chadchat.domain.User;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class Database {
     // JDBC driver name and database URL
@@ -21,11 +18,12 @@ public class Database {
      * users table in chatchad with an id and name.
      *
      * @throws ClassNotFoundException : If not found class
-     * @throws SQLException : If exception.
+     * @throws SQLException           : If exception.
      */
 
     private static void dbTest() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
+
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
             var stmt = conn.createStatement();
             String sql;
@@ -39,4 +37,43 @@ public class Database {
             }
         }
     }
-}
+
+    public static int saveDBUser(String name) throws SQLException {
+        String sql;
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)){
+
+            var stmt = conn.createStatement();
+            PreparedStatement ps = conn.prepareStatement(
+
+                    sql = "Insert into chadchat.users (username) VALUES (?);"
+            );
+
+            ResultSet rs = stmt.executeQuery(sql);
+            ps.setString(1, name);
+
+        }
+        //Få Id tilbage fra database, og return
+        return 0;
+    }
+/*
+    public static User getUserfromDB(String name) throws SQLException, ClassNotFoundException {
+        Class.forName(JDBC_DRIVER);
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
+            var stmt = conn.createStatement();
+            String sql;
+            sql = "SELECT id from chadchat.users where username = ?;";
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                       name);
+                System.out.println(user);
+                return user;
+            }
+
+        }
+        return null;
+    } */
+    }
