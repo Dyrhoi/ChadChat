@@ -8,6 +8,8 @@ import chadchat.infrastructure.Database;
 
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.HashMap;
 
 public class Protocol implements Runnable {
 
@@ -51,11 +53,10 @@ public class Protocol implements Runnable {
                     }
 
                     cmd.execute(client);
-                    continue;
                 } catch (ParseException e) {
                     this.client.getOutput().println(e.getMessage());
-                    continue;
                 }
+                continue;
             }
 
             Message message = new Message(input,this.client.getUser());
@@ -68,14 +69,15 @@ public class Protocol implements Runnable {
     public User initUser() {
         User user;
 
+
         String[] input;
         do {
             this.client.getOutput().println("Enter your (current or new) username and password.");
             input = this.client.getInput().nextLine().split(" ");
             if (input.length != 2) {
                 this.client.getOutput().println("Incorrect format, correct format is: username password");
-                continue;
             }
+
             String username = input[0];
             String password = input[1];
 
@@ -108,28 +110,67 @@ public class Protocol implements Runnable {
      *
      * */
 
+    //TODO: Commandlist hashmap implementation
+
     public Command fetchCommand(String commandString) throws ParseException {
         String[] commandData = commandString.split(" ");
         String commandIdentifier = commandData[0];
-
+        String[] args = commandData.length > 1 ? Arrays.copyOfRange(commandData, 1, commandData.length) : null;
         switch (commandIdentifier) {
             case("quit"):
                 return null;
-            case("channels"):
-                return new ListChannelsCommand();
+            case("channel"):
+                return new ChannelCommand(args);
+            case("help"):
+                return new HelpCommand();
+            default:
+                throw new ParseException("Could not find command: " + commandIdentifier, 0);
         }
-        throw new ParseException("Could not find command: " + commandIdentifier, 0);
+
     }
 
     public interface Command {
         void execute(Client client);
     }
 
-    public class ListChannelsCommand implements Command {
+    public class ChannelCommand implements Command {
+        private String subcommand;
+        private String[] args;
+
+        public ChannelCommand(String[] args) {
+            if(args != null) {
+                this.subcommand = args[0];
+                this.args = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : null;
+            }
+        }
 
         @Override
         public void execute(Client client) {
-            client.getOutput().println("We're now listing the channels:");
+            if(this.subcommand != null) {
+                switch (this.subcommand) {
+                    case("list"):
+                        client.getOutput().println("Here we would list channels:");
+                        break;
+                    default:
+                        client.getOutput().println(getHelperMessage());
+                }
+            }
+            else {
+                client.getOutput().println(getHelperMessage());
+            }
+        }
+
+        public String getHelperMessage() {
+            return "Available subcommands for command channel:\n" +
+                    "/channel list";
+        }
+    }
+
+    public class HelpCommand implements Command {
+
+        @Override
+        public void execute(Client client) {
+            client.getOutput().println("Help command issued: Help");
         }
     }
 
