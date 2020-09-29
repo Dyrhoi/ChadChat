@@ -40,8 +40,7 @@ public class Protocol implements Runnable {
             if(input.startsWith("/")) {
                 System.out.println(client.getIdentifierName() + " issued command: " + input);
                 //Executing command:
-                String[] commandArray = input.split(" ");
-                String commandString = commandArray[0].substring(1);
+                String commandString = input.substring(1);
                 try {
                     Command cmd = fetchCommand(commandString);
 
@@ -109,13 +108,16 @@ public class Protocol implements Runnable {
      * */
 
     public Command fetchCommand(String commandString) throws ParseException {
-        switch (commandString) {
+        String[] commandData = commandString.split(" ");
+        String commandIdentifier = commandData[0];
+
+        switch (commandIdentifier) {
             case("quit"):
                 return null;
             case("channels"):
                 return new ListChannelsCommand();
         }
-        throw new ParseException("Could not find command: " + commandString, 0);
+        throw new ParseException("Could not find command: " + commandIdentifier, 0);
     }
 
     public interface Command {
