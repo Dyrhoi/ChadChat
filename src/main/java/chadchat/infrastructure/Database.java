@@ -13,31 +13,44 @@ public class Database {
     static final String USER = "chadchat";
     static final String PASS = null;
 
-    /**
-     * This is purely a data base test. Given that you have created a
-     * users table in chatchad with an id and name.
-     *
-     * @throws ClassNotFoundException : If not found class
-     * @throws SQLException           : If exception.
-     */
+    // Database version
+    private static final int version = 0;
 
-    private static void dbTest() throws ClassNotFoundException, SQLException {
-        Class.forName(JDBC_DRIVER);
-
-        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
-            var stmt = conn.createStatement();
-            String sql;
-            sql = "SELECT id, name FROM users";
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                User user = new User(
-                        rs.getInt("id"),
-                        rs.getString("name"));
-                System.out.println(user);
-            }
+    public Database() {
+        if (getCurrentVersion() != getVersion()) {
+            throw new IllegalStateException("Database in wrong state, expected:"
+                    + getVersion() + ", got: " + getCurrentVersion());
         }
     }
 
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(DB_URL, USER, PASS);
+    }
+
+    public static int getVersion() {
+        return version;
+    }
+
+    public static int getCurrentVersion() {
+        try (Connection conn = getConnection()) {
+            Statement s = conn.createStatement();
+            ResultSet rs = s.executeQuery("SELECT value FROM properties WHERE name = 'version';");
+            if (rs.next()) {
+                String column = rs.getString("value");
+                return Integer.parseInt(column);
+            } else {
+                System.err.println("No version in properties.");
+                return -1;
+            }
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+            return -1;
+        }
+    }
+
+
+     /*
     public static int saveDBUser(String name) throws SQLException {
         String sql;
 
@@ -56,7 +69,6 @@ public class Database {
         //Få Id tilbage fra database, og return
         return 0;
     }
-/*
     public static User getUserfromDB(String name) throws SQLException, ClassNotFoundException {
         Class.forName(JDBC_DRIVER);
 
@@ -76,4 +88,4 @@ public class Database {
         }
         return null;
     } */
-    }
+}
