@@ -37,6 +37,7 @@ public class Protocol implements Runnable {
         String input;
         while(true) {
             input = client.getInput().nextLine();
+
             if(input.startsWith("/")) {
                 System.out.println(client.getIdentifierName() + " issued command: " + input);
                 //Executing command:
