@@ -81,5 +81,15 @@ public class Server {
     }
 
 
-        }
+    public User fetchUser(String username) {
+        //Todo: Fetch user
+        return null;
+    }
+
+    public User createUser(String username, String password) {
+        //Todo: Create user in database.
+
+        return new User(-1, username);
+    }
+}
 
