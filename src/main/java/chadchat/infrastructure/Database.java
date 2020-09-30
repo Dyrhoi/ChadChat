@@ -57,7 +57,7 @@ public class Database implements UserRepository {
     public User findUser(String name) throws NoSuchElementException {
         try(Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
-                    "SELECT * FROM users WHERE name = ?;");
+                    "SELECT * FROM users WHERE username = ?;");
             s.setString(1, name);
             ResultSet rs = s.executeQuery();
             if(rs.next()) {
