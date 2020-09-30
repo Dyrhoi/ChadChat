@@ -67,7 +67,7 @@ public class Protocol implements Runnable {
     }
 
     public User initUser() {
-        User user = null;
+        User user;
 
 
         String[] input;
@@ -76,7 +76,7 @@ public class Protocol implements Runnable {
             input = this.client.getInput().nextLine().strip().split(" ");
             if (input.length != 2) {
                 this.client.getOutput().println("Incorrect format, correct format is: username password");
-                break;
+                continue;
             }
 
             String username = input[0];
