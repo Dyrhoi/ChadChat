@@ -67,15 +67,16 @@ public class Protocol implements Runnable {
     }
 
     public User initUser() {
-        User user;
+        User user = null;
 
 
         String[] input;
         do {
             this.client.getOutput().println("Enter your (current or new) username and password.");
-            input = this.client.getInput().nextLine().split(" ");
+            input = this.client.getInput().nextLine().strip().split(" ");
             if (input.length != 2) {
                 this.client.getOutput().println("Incorrect format, correct format is: username password");
+                break;
             }
 
             String username = input[0];
