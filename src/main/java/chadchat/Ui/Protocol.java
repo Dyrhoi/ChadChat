@@ -2,13 +2,13 @@ package chadchat.Ui;
 
 import chadchat.API.InvalidPasswordException;
 import chadchat.domain.*;
+import chadchat.domain.message.Message;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
 import chadchat.domain.user.UserNotFoundException;
 
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 public class Protocol implements Runnable {
 
@@ -58,7 +58,7 @@ public class Protocol implements Runnable {
                 continue;
             }
 
-            Message message = new Message(input,this.client.getUser());
+            Message message = this.server.getChadchat().createMessage(input, this.client.getUser());
             System.out.println(client.getIdentifierName() + " : " + input);
 
             this.server.broadcast(this.client, message);

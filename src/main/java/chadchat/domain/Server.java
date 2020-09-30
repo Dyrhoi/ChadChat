@@ -2,13 +2,12 @@ package chadchat.domain;
 
 import chadchat.API.ChadChat;
 import chadchat.Ui.Protocol;
+import chadchat.domain.message.Message;
 import chadchat.infrastructure.Database;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,7 +20,7 @@ public class Server {
 
     public Server(int port) {
         Database database = new Database();
-        this.chadchat = new ChadChat(database);
+        this.chadchat = new ChadChat(database, database);
         this.port = port;
 
         this.isRunning = true;

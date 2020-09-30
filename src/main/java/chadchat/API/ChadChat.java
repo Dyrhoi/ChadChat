@@ -1,5 +1,8 @@
 package chadchat.API;
 
+import chadchat.domain.message.Message;
+import chadchat.domain.message.MessageNotFoundException;
+import chadchat.domain.message.MessageRepository;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
 import chadchat.domain.user.UserNotFoundException;
@@ -7,8 +10,10 @@ import chadchat.domain.user.UserRepository;
 
 public class ChadChat {
     private final UserRepository users;
-    public ChadChat(UserRepository users) {
+    private final MessageRepository messages;
+    public ChadChat(UserRepository users, MessageRepository messages) {
         this.users = users;
+        this.messages = messages;
     }
 
     public User createUser(String username, String password) throws UserExistsException {
@@ -27,6 +32,15 @@ public class ChadChat {
             return user;
         } else  {
             throw new InvalidPasswordException();
+        }
+    }
+
+    public Message createMessage(String message, User user) {
+        try {
+            return messages.createMessage(user.getId(), message);
+        } catch (MessageNotFoundException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

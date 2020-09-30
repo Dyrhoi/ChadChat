@@ -1,15 +1,17 @@
-package chadchat.domain;
+package chadchat.domain.message;
 
 import chadchat.domain.user.User;
 
 import java.time.LocalDateTime;
 
 public class Message {
-    private String message;
-    private LocalDateTime time;
-    private User user;
+    private final String message;
+    private final LocalDateTime time;
+    private final User user;
+    private final int id;
 
-    public Message(String message, User user) {
+    public Message(int id, String message, User user) {
+        this.id = id;
         this.message = message;
         this.time = LocalDateTime.now();
         this.user = user;

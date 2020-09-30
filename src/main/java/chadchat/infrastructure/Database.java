@@ -1,5 +1,8 @@
 package chadchat.infrastructure;
 
+import chadchat.domain.message.Message;
+import chadchat.domain.message.MessageNotFoundException;
+import chadchat.domain.message.MessageRepository;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
 import chadchat.domain.user.UserNotFoundException;
@@ -9,7 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-public class Database implements UserRepository {
+public class Database implements UserRepository, MessageRepository {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/chadchat?serverTimezone=UTC&allowPublicKeyRetrieval=true";
@@ -142,4 +145,75 @@ public class Database implements UserRepository {
     }
 
 
+    /*
+
+
+    Messages
+
+
+     */
+
+    private Message loadMessage(ResultSet rs) throws SQLException {
+        return new Message(
+                rs.getInt("messages.id"),
+                rs.getString("messages.message"),
+                findUser(rs.getInt("messages.user"))
+        );
+    }
+
+
+    @Override
+    public Message findMessage(int id) throws MessageNotFoundException {
+        try(Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM messages WHERE id = ?;");
+            s.setInt(1, id);
+            ResultSet rs = s.executeQuery();
+            if(rs.next()) {
+                return loadMessage(rs);
+            } else {
+                System.err.println("No version in properties.");
+                throw new NoSuchElementException("No message with id: " + id);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Iterable<Message> findAllMessagesByUser(int userid) {
+        return null;
+    }
+
+    @Override
+    public Iterable<Message> findAllMessages() {
+        return null;
+    }
+
+    @Override
+    public Message createMessage(int userid, String message) throws MessageNotFoundException {
+        int id;
+        try (Connection conn = getConnection()) {
+            var ps =
+                    conn.prepareStatement(
+                            "INSERT INTO messages (message, user) " +
+                                    "VALUE (?,?);",
+                            Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, message);
+            ps.setInt(2, userid);
+
+            ps.executeUpdate();
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                id = rs.getInt(1);
+            } else {
+                System.err.println("Something went wrong.");
+                throw new RuntimeException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return findMessage(id);
+    }
 }
