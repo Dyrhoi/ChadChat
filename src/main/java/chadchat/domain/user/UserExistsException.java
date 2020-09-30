@@ -1,4 +1,4 @@
-package chadchat.domain;
+package chadchat.domain.user;
 
 public class UserExistsException extends Exception {
 

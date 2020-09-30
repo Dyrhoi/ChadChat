@@ -1,8 +1,9 @@
 package chadchat.infrastructure;
 
-import chadchat.domain.User;
-import chadchat.domain.UserExistsException;
-import chadchat.domain.UserRepository;
+import chadchat.domain.user.User;
+import chadchat.domain.user.UserExistsException;
+import chadchat.domain.user.UserNotFoundException;
+import chadchat.domain.user.UserRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class Database implements UserRepository {
     }
 
     @Override
-    public User findUser(String name) throws NoSuchElementException {
+    public User findUser(String name) throws UserNotFoundException {
         try(Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
                     "SELECT * FROM users WHERE username = ?;");
@@ -63,8 +64,7 @@ public class Database implements UserRepository {
             if(rs.next()) {
                 return loadUser(rs);
             } else {
-                System.err.println("No version in properties.");
-                throw new NoSuchElementException(name);
+                throw new UserNotFoundException(name);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);

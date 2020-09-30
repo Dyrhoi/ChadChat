@@ -1,15 +1,14 @@
 package chadchat.Ui;
 
-import chadchat.domain.Client;
-import chadchat.domain.Message;
-import chadchat.domain.Server;
-import chadchat.domain.User;
-import chadchat.infrastructure.Database;
+import chadchat.API.InvalidPasswordException;
+import chadchat.domain.*;
+import chadchat.domain.user.User;
+import chadchat.domain.user.UserExistsException;
+import chadchat.domain.user.UserNotFoundException;
 
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 public class Protocol implements Runnable {
 
@@ -34,7 +33,7 @@ public class Protocol implements Runnable {
 
         User user = initUser();
         this.client.setUser(user);
-        this.client.getOutput().println("Welcome: " + user.getName());
+        this.client.getOutput().println("Welcome: " + user.getUsername());
 
         String input;
         while(true) {
@@ -82,19 +81,27 @@ public class Protocol implements Runnable {
             String username = input[0];
             String password = input[1];
 
-            //find user in database
-            if((user = this.server.fetchUser(username)) != null) {
-                //Try to login...
+            try {
+                user = this.server.getChadchat().login(username, password);
+                System.out.println(client.getIdentifierName() + ": logged into user: " + username);
                 break;
-            }
-            this.client.getOutput().println(
-                    "This user doesn't exist in our database.\n" +
-                    "Do you want to create a new user? yes|no"
-            );
-            String answer = this.client.getInput().nextLine().strip().toLowerCase();
-            if(answer.equals("yes")) {
-                user = this.server.createUser(username, password);
-                break;
+            } catch (UserNotFoundException e) {
+                this.client.getOutput().println(
+                        "This user doesn't exist in our database.\n" +
+                                "Do you want to create a new user? yes|no"
+                );
+                String answer = this.client.getInput().nextLine().strip().toLowerCase();
+                if(answer.equals("yes")) {
+                    try {
+                        user = this.server.getChadchat().createUser(username, password);
+                        break;
+                    } catch (UserExistsException ex) {
+                        this.client.getOutput().println("An error occurred while trying to create the user. Try again.");
+                        ex.printStackTrace();
+                    }
+                }
+            } catch (InvalidPasswordException e) {
+                this.client.getOutput().println("Invalid password for this user. Try again. Or use a different username.");
             }
 
         } while(true);

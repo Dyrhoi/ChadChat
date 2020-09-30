@@ -1,14 +1,6 @@
 package chadchat.entries;
 
-import chadchat.domain.User;
-import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class DBFetchTest {
 
@@ -28,20 +20,20 @@ class DBFetchTest {
      * @throws SQLException : If exception.
      */
 
-    @Test
+    /*@Test
     void dbTest() throws ClassNotFoundException, SQLException {
         Class.forName(JDBC_DRIVER);
         try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS)) {
             var stmt = conn.createStatement();
             String sql;
-            sql = "SELECT id, name FROM users";
+            sql = "SELECT id, username FROM users";
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 User user = new User(
                         rs.getInt("id"),
-                        rs.getString("name"));
+                        rs.getString("username"));
                 System.out.println(user);
             }
         }
-    }
+    }*/
 }

@@ -1,4 +1,4 @@
-package chadchat.domain;
+package chadchat.domain.user;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -42,30 +42,24 @@ public class User {
             throw new RuntimeException(e);
         }
     }
-    private int id; //final?
-    private final String name;
+    private final int id; //final?
+    private final String username;
     private final LocalDateTime createdAt;
     private final byte[] salt;
     private final byte[] secret;
 
-    public User(int id, String name, LocalDateTime createdAt, byte[] salt, byte[] secret) {
+    public User(int id, String username, LocalDateTime createdAt, byte[] salt, byte[] secret) {
         this.id = id;
-        this.name = name;
+        this.username = username;
         this.createdAt = createdAt;
         this.salt = salt;
         this.secret = secret;
     }
 
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-
 
 
     public boolean isPasswordCorrect(String password) {
@@ -76,7 +70,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + username + '\'' +
                 ", createdAt=" + createdAt +
                 ", salt=" + byteArrayToHex(salt) +
                 ", secret=" + byteArrayToHex(secret) +

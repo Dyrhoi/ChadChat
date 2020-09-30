@@ -1,5 +1,7 @@
 package chadchat.domain;
 
+import chadchat.domain.user.User;
+
 import java.time.LocalDateTime;
 
 public class Message {
@@ -21,6 +23,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return formatTime() + "\n" + user.getName() +" : "+ message;
+        return formatTime() + "\n" + user.getUsername() +" : "+ message;
     }
 }
