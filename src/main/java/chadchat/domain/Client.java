@@ -1,8 +1,10 @@
 package chadchat.domain;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class Client {
@@ -16,7 +18,9 @@ public class Client {
     public Client(Socket socket) throws IOException {
         this.socket = socket;
 
-        this.output = new PrintWriter(socket.getOutputStream(), true);
+        this.output = new PrintWriter(
+                new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),
+                true);
         this.input = new Scanner(socket.getInputStream());
         this.identifierName = socket.getInetAddress().getHostAddress() + " : " + socket.getPort();
     }
