@@ -1,8 +1,10 @@
 package chadchat.domain;
 
+import chadchat.API.ChadChat;
 import chadchat.Ui.Protocol;
 import chadchat.infrastructure.Database;
 
+import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -15,8 +17,11 @@ public class Server {
     private final int port;
     private boolean isRunning;
     private List<Client> clients;
+    private final ChadChat chadchat;
 
     public Server(int port) {
+        Database database = new Database();
+        this.chadchat = new ChadChat(database);
         this.port = port;
 
         this.isRunning = true;
@@ -89,7 +94,7 @@ public class Server {
     public User createUser(String username, String password) {
         //Todo: Create user in database.
 
-        return new User(-1, username);
+        return this.chadchat.createUser(username, password);
     }
 }
 
