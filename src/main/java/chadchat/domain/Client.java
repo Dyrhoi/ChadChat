@@ -21,7 +21,7 @@ public class Client {
         this.output = new PrintWriter(
                 new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8),
                 true);
-        this.input = new Scanner(socket.getInputStream());
+        this.input = new Scanner(socket.getInputStream(), StandardCharsets.UTF_8);
         this.identifierName = socket.getInetAddress().getHostAddress() + " : " + socket.getPort();
     }
 
