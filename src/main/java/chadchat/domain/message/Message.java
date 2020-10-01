@@ -19,7 +19,7 @@ public class Message {
 
     public String formatTime(){
         String weekDay = time.getDayOfWeek().name();
-        String timeClock = time.getHour() + ":"+ time.getMinute();
+        String timeClock = String.format("%02d:%02d", time.getHour(), time.getMinute());
         return weekDay + " " + timeClock;
     }
 
