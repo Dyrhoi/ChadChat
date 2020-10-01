@@ -22,7 +22,7 @@ public class Database implements UserRepository, MessageRepository {
     static final String PASS = null;
 
     // Database version
-    private static final int version = 0;
+    private static final int version = 1;
 
     public Database() {
         if (getCurrentVersion() != getVersion()) {
