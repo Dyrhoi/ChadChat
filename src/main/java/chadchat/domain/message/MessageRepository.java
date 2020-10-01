@@ -8,9 +8,11 @@ public interface MessageRepository {
 
     Message findMessage(int id) throws MessageNotFoundException;
 
-    Iterable<Message> findAllMessagesByUser(int userid);
-
     Iterable<Message> findAllMessages();
+
+    Iterable<Message> findAllMessagesByUser(int userId);
+
+    Iterable<Message> findAllMessagesByChannelId(int channelId);
 
     Message createMessage(int userid, String message) throws MessageNotFoundException;
 

@@ -1,5 +1,7 @@
 package chadchat.infrastructure;
 
+import chadchat.domain.channel.Channel;
+import chadchat.domain.channel.ChannelRepository;
 import chadchat.domain.message.Message;
 import chadchat.domain.message.MessageNotFoundException;
 import chadchat.domain.message.MessageRepository;
@@ -12,7 +14,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-public class Database implements UserRepository, MessageRepository {
+public class Database implements UserRepository, MessageRepository, ChannelRepository {
     // JDBC driver name and database URL
     static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     static final String DB_URL = "jdbc:mysql://localhost/chadchat?serverTimezone=UTC&allowPublicKeyRetrieval=true";
@@ -22,7 +24,7 @@ public class Database implements UserRepository, MessageRepository {
     static final String PASS = null;
 
     // Database version
-    private static final int version = 1;
+    private static final int version = 2;
 
     public Database() {
         if (getCurrentVersion() != getVersion()) {
@@ -114,6 +116,12 @@ public class Database implements UserRepository, MessageRepository {
         }
     }
 
+    //TODO: this.
+    @Override
+    public Iterable<User> findAllUsersByChannel(int id) {
+        return null;
+    }
+
     @Override
     public User createUser(String name, byte[] salt, byte[] secret) throws UserExistsException {
         int id;
@@ -186,6 +194,11 @@ public class Database implements UserRepository, MessageRepository {
     }
 
     @Override
+    public Iterable<Message> findAllMessagesByChannelId(int channelId) {
+        return null;
+    }
+
+    @Override
     public Iterable<Message> findAllMessages() {
         return null;
     }
@@ -215,5 +228,17 @@ public class Database implements UserRepository, MessageRepository {
             throw new RuntimeException(e);
         }
         return findMessage(id);
+    }
+
+    private Channel loadChannel(ResultSet rs) throws SQLException {
+        return new Channel(
+                rs.getInt("channels.id"),
+                rs.getString("channels.name")
+        );
+    }
+
+    @Override
+    public Iterable<Channel> getAllChannels() {
+        return null;
     }
 }
