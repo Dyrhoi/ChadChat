@@ -1,5 +1,6 @@
 package chadchat.domain.message;
 
+import chadchat.domain.channel.Channel;
 import chadchat.domain.user.User;
 
 import java.time.LocalDateTime;
@@ -9,12 +10,14 @@ public class Message {
     private final LocalDateTime time;
     private final User user;
     private final int id;
+    private final Channel channel;
 
-    public Message(int id, String message, User user) {
+    public Message(int id, String message, User user, Channel channel) {
         this.id = id;
         this.message = message;
         this.time = LocalDateTime.now();
         this.user = user;
+        this.channel = channel;
     }
 
     public String formatTime(){
@@ -25,6 +28,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return formatTime() + "\n" + user.getUsername() +" : "+ message;
+        return formatTime() + "\n" + "[" + channel.getName() + "] " +  user.getUsername() +" : "+ message;
     }
 }

@@ -42,6 +42,7 @@ public class Server {
                 continue;
             loopedClient.getOutput().println(message);
         }
+        System.out.println(message);
     }
 
     public void start() throws IOException {

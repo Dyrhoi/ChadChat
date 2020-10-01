@@ -1,6 +1,7 @@
 package chadchat.infrastructure;
 
 import chadchat.domain.channel.Channel;
+import chadchat.domain.channel.ChannelNotFoundException;
 import chadchat.domain.channel.ChannelRepository;
 import chadchat.domain.message.Message;
 import chadchat.domain.message.MessageNotFoundException;
@@ -165,7 +166,8 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         return new Message(
                 rs.getInt("messages.id"),
                 rs.getString("messages.message"),
-                findUser(rs.getInt("messages.user"))
+                findUser(rs.getInt("messages.user")),
+                findChannel(rs.getInt("messages.channel"))
         );
     }
 
@@ -204,16 +206,17 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
     }
 
     @Override
-    public Message createMessage(int userid, String message) throws MessageNotFoundException {
+    public Message createMessage(int userid, String message, int channelid) throws MessageNotFoundException {
         int id;
         try (Connection conn = getConnection()) {
             var ps =
                     conn.prepareStatement(
-                            "INSERT INTO messages (message, user) " +
-                                    "VALUE (?,?);",
+                            "INSERT INTO messages (message, user, channel) " +
+                                    "VALUE (?,?, ?);",
                             Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, message);
             ps.setInt(2, userid);
+            ps.setInt(3, channelid);
 
             ps.executeUpdate();
 
@@ -250,5 +253,60 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public Channel findChannel(int id) {
+        try(Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM channels WHERE id = ?;");
+            s.setInt(1, id);
+            ResultSet rs = s.executeQuery();
+            if(rs.next()) {
+                return loadChannel(rs);
+            } else {
+                System.err.println("No version in properties.");
+                throw new NoSuchElementException("No channel with id: " + id);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Channel createChannel(String name, int userid) throws ChannelNotFoundException {
+        int id;
+        try (Connection conn = getConnection()) {
+            var ps =
+                    conn.prepareStatement(
+                            "INSERT INTO channels (name) " +
+                                    "VALUE (?);",
+                            Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+
+            ps.executeUpdate();
+
+
+            ResultSet rs = ps.getGeneratedKeys();
+            if (rs.next()) {
+                id = rs.getInt(1);
+
+                var ps2 =
+                        conn.prepareStatement(
+                                "INSERT INTO users_channels (user, channel) " +
+                                        "VALUE (?, ?);");
+                ps2.setInt(1, userid);
+                ps2.setInt(2, id);
+
+                ps2.executeUpdate();
+
+            } else {
+                System.err.println("Something went wrong.");
+                throw new RuntimeException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return findChannel(id);
     }
 }

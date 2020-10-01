@@ -1,5 +1,7 @@
 package chadchat.domain.user;
 
+import chadchat.domain.channel.Channel;
+
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
@@ -47,6 +49,7 @@ public class User {
     private final LocalDateTime createdAt;
     private final byte[] salt;
     private final byte[] secret;
+    private int currentChannel;
 
     public User(int id, String username, LocalDateTime createdAt, byte[] salt, byte[] secret) {
         this.id = id;
@@ -54,6 +57,8 @@ public class User {
         this.createdAt = createdAt;
         this.salt = salt;
         this.secret = secret;
+
+        this.currentChannel = 1;
     }
 
 
@@ -87,6 +92,14 @@ public class User {
 
     public int getId() {
         return this.id;
+    }
+
+    public void setCurrentChannel(int currentChannel) {
+        this.currentChannel = currentChannel;
+    }
+
+    public int getCurrentChannel() {
+        return currentChannel;
     }
 }
 

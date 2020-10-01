@@ -1,6 +1,7 @@
 package chadchat.API;
 
 import chadchat.domain.channel.Channel;
+import chadchat.domain.channel.ChannelNotFoundException;
 import chadchat.domain.channel.ChannelRepository;
 import chadchat.domain.message.Message;
 import chadchat.domain.message.MessageNotFoundException;
@@ -41,7 +42,7 @@ public class ChadChat {
 
     public Message createMessage(String message, User user) {
         try {
-            return messages.createMessage(user.getId(), message);
+            return messages.createMessage(user.getId(), message, user.getCurrentChannel());
         } catch (MessageNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -50,6 +51,10 @@ public class ChadChat {
 
     public Iterable<Channel> findAllChannels() {
         return channels.findAllChannels();
+    }
+
+    public Channel createChannel(String name, User user) throws ChannelNotFoundException, RuntimeException {
+        return channels.createChannel(name, user.getId());
     }
 
 

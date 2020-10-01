@@ -3,6 +3,7 @@ package chadchat.Ui;
 import chadchat.API.InvalidPasswordException;
 import chadchat.domain.*;
 import chadchat.domain.channel.Channel;
+import chadchat.domain.channel.ChannelNotFoundException;
 import chadchat.domain.message.Message;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
@@ -60,7 +61,6 @@ public class Protocol implements Runnable {
             }
 
             Message message = this.server.getChadchat().createMessage(input, this.client.getUser());
-            System.out.println(client.getIdentifierName() + " : " + input);
 
             this.server.broadcast(this.client, message);
         }
@@ -164,6 +164,36 @@ public class Protocol implements Runnable {
                         }
                         protocol.client.getOutput().println(sb.toString());
                         break;
+                    case("create"):
+                        if(args != null && args.length == 1) {
+                            String name = args[0];
+                            protocol.client.getOutput().println("Are you sure you want to create channel: " + name);
+                            protocol.client.getOutput().println("Yes | No");
+                            if(protocol.client.getInput().nextLine().equalsIgnoreCase("yes")) {
+                                try {
+                                    protocol.server.getChadchat().createChannel(name, protocol.client.getUser());
+                                    protocol.client.getOutput().println("Channel " + name + " was successfully created.");
+                                } catch (ChannelNotFoundException e) {
+                                    protocol.client.getOutput().println(
+                                            "An error occurred while creating the channel.\n" +
+                                            "Please try again later."
+                                    );
+                                    e.printStackTrace();
+                                } catch (RuntimeException e) {
+                                    protocol.client.getOutput().println(
+                                            "Channel with name " + name + " already exists.\n" +
+                                            "Use /channel join " + name + " to join this channel."
+                                    );
+
+                                }
+                            } else {
+                                protocol.client.getOutput().println("Aborting channel creation.");
+                            }
+                        }
+                        else {
+                            protocol.client.getOutput().println(getHelperMessage());
+                        }
+                        break;
                     default:
                         protocol.client.getOutput().println(getHelperMessage());
                 }
@@ -175,7 +205,8 @@ public class Protocol implements Runnable {
 
         public String getHelperMessage() {
             return "Available subcommands for command channel:\n" +
-                    "/channel list";
+                    "/channel list\n" +
+                    "/channel create <name>";
         }
     }
 
