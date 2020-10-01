@@ -2,6 +2,7 @@ package chadchat.Ui;
 
 import chadchat.API.InvalidPasswordException;
 import chadchat.domain.*;
+import chadchat.domain.channel.Channel;
 import chadchat.domain.message.Message;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
@@ -51,7 +52,7 @@ public class Protocol implements Runnable {
                         break;
                     }
 
-                    cmd.execute(client);
+                    cmd.execute(this);
                 } catch (ParseException e) {
                     this.client.getOutput().println(e.getMessage());
                 }
@@ -138,7 +139,7 @@ public class Protocol implements Runnable {
     }
 
     public interface Command {
-        void execute(Client client);
+        void execute(Protocol protocol);
     }
 
     public class ChannelCommand implements Command {
@@ -153,18 +154,22 @@ public class Protocol implements Runnable {
         }
 
         @Override
-        public void execute(Client client) {
+        public void execute(Protocol protocol) {
             if(this.subcommand != null) {
                 switch (this.subcommand) {
                     case("list"):
-                        client.getOutput().println("Here we would list channels:");
+                        StringBuilder sb = new StringBuilder();
+                        for(Channel c : protocol.server.getChadchat().findAllChannels()) {
+                            sb.append(">").append(c).append("\n");
+                        }
+                        protocol.client.getOutput().println(sb.toString());
                         break;
                     default:
-                        client.getOutput().println(getHelperMessage());
+                        protocol.client.getOutput().println(getHelperMessage());
                 }
             }
             else {
-                client.getOutput().println(getHelperMessage());
+                protocol.client.getOutput().println(getHelperMessage());
             }
         }
 
@@ -177,8 +182,8 @@ public class Protocol implements Runnable {
     public class HelpCommand implements Command {
 
         @Override
-        public void execute(Client client) {
-            client.getOutput().println("Help command issued: Help");
+        public void execute(Protocol protocol) {
+            protocol.client.getOutput().println("Help command issued: Help");
         }
     }
 

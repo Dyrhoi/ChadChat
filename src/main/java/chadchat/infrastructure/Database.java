@@ -24,7 +24,7 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
     static final String PASS = null;
 
     // Database version
-    private static final int version = 2;
+    private static final int version = 3;
 
     public Database() {
         if (getCurrentVersion() != getVersion()) {
@@ -238,7 +238,17 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
     }
 
     @Override
-    public Iterable<Channel> getAllChannels() {
-        return null;
+    public Iterable<Channel> findAllChannels() {
+        try (Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement("SELECT * FROM channels;");
+            ResultSet rs = s.executeQuery();
+            ArrayList<Channel> items = new ArrayList<>();
+            while(rs.next()) {
+                items.add(loadChannel(rs));
+            }
+            return items;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

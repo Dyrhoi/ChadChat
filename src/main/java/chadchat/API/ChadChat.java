@@ -1,5 +1,7 @@
 package chadchat.API;
 
+import chadchat.domain.channel.Channel;
+import chadchat.domain.channel.ChannelRepository;
 import chadchat.domain.message.Message;
 import chadchat.domain.message.MessageNotFoundException;
 import chadchat.domain.message.MessageRepository;
@@ -11,9 +13,11 @@ import chadchat.domain.user.UserRepository;
 public class ChadChat {
     private final UserRepository users;
     private final MessageRepository messages;
-    public ChadChat(UserRepository users, MessageRepository messages) {
+    private final ChannelRepository channels;
+    public ChadChat(UserRepository users, MessageRepository messages, ChannelRepository channels) {
         this.users = users;
         this.messages = messages;
+        this.channels = channels;
     }
 
     public User createUser(String username, String password) throws UserExistsException {
@@ -42,6 +46,10 @@ public class ChadChat {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public Iterable<Channel> findAllChannels() {
+        return channels.findAllChannels();
     }
 
 

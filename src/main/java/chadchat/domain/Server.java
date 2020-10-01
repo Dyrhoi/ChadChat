@@ -20,7 +20,7 @@ public class Server {
 
     public Server(int port) {
         Database database = new Database();
-        this.chadchat = new ChadChat(database, database);
+        this.chadchat = new ChadChat(database, database, database);
         this.port = port;
 
         this.isRunning = true;

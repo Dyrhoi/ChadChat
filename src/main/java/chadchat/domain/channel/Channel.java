@@ -14,4 +14,9 @@ public class Channel {
         this.name = name;
         this.time = LocalDateTime.now();
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
