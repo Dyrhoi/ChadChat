@@ -8,6 +8,7 @@ import chadchat.domain.user.UserExistsException;
 import java.util.List;
 
 public interface ChannelRepository {
+    Iterable<Channel> findAllChannelsByUser(int userId);
     Iterable<Channel> findAllChannels();
     Channel findChannel(int id);
     Channel createChannel(String name, int userid) throws ChannelNotFoundException;

@@ -30,4 +30,8 @@ public class Message {
     public String toString() {
         return formatTime() + "\n" + "[" + channel.getName() + "] " +  user.getUsername() +" : "+ message;
     }
+
+    public Channel getChannel() {
+        return this.channel;
+    }
 }

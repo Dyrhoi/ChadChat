@@ -10,6 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class User {
     private static final int PASSWORD_ITERATIONS = 65536;
@@ -58,7 +59,7 @@ public class User {
         this.salt = salt;
         this.secret = secret;
 
-        this.currentChannel = 1;
+        this.currentChannel = -1;
     }
 
 
@@ -100,6 +101,19 @@ public class User {
 
     public int getCurrentChannel() {
         return currentChannel;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
 

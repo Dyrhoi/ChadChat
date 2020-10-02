@@ -6,8 +6,6 @@ public interface UserRepository {
 
     Iterable<User> findAllUsers();
 
-    Iterable<User> findAllUsersByChannel(int id);
-
     User createUser(String name, byte[] salt, byte[] secret) throws UserExistsException;
 }
 

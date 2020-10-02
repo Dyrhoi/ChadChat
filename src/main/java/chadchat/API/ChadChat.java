@@ -50,6 +50,11 @@ public class ChadChat {
         }
     }
 
+    public Iterable<Channel> findAllChannelsByUser(User user) {
+        int id = user.getId();
+        return channels.findAllChannelsByUser(id);
+    }
+
     public Iterable<Channel> findAllChannels() {
         return channels.findAllChannels();
     }
@@ -60,7 +65,7 @@ public class ChadChat {
 
     public Channel joinChannel(String name, User user) throws ChannelNotFoundException, UserExistsException {
         int id = user.getId();
-        Channel channel = null;
+        Channel channel;
 
         channel = channels.findChannel(name);
         channels.joinChannel(id, channel.getId());
@@ -89,5 +94,9 @@ public class ChadChat {
     public boolean findUsersByChannel(String name, User user) throws ChannelNotFoundException {
         int channelId = channels.findChannel(name).getId();
         return channelContainsUser(user, channelId);
+    }
+
+    public Channel findChannel(String name) throws ChannelNotFoundException {
+        return this.channels.findChannel(name);
     }
 }

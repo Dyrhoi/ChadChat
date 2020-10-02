@@ -2,6 +2,7 @@ package chadchat.domain;
 
 import chadchat.API.ChadChat;
 import chadchat.Ui.Protocol;
+import chadchat.domain.channel.ChannelNotFoundException;
 import chadchat.domain.message.Message;
 import chadchat.domain.user.User;
 import chadchat.infrastructure.Database;
@@ -28,20 +29,15 @@ public class Server {
         this.isRunning = true;
         this.clients = new ArrayList<>();
     }
-    /*public User saveUsertoDB(String name ) throws SQLException, ClassNotFoundException {
-        User user = new User(-1, name);
-       int iD = Database.saveDBUser(name);
-       user = Database.getUserfromDB(name);
-       user.
 
-
-        return user;
- } */
-
-    public void broadcast(Client client, Message message) {
+    public void broadcast(Client client, Message message) throws ChannelNotFoundException {
         for (Client loopedClient : this.clients) {
-            if (loopedClient.getUser() == null)
+            //If user is not initialized or the user isn't subscribed to the message channel, ignore.
+            if (loopedClient.getUser() == null ||
+                !chadchat.channelContainsUser(loopedClient.getUser(), message.getChannel().getId())
+            )
                 continue;
+            //Print if conditions are false.
             loopedClient.getOutput().println(message);
         }
         System.out.println(message);
@@ -60,7 +56,6 @@ public class Server {
             Protocol protocol = new Protocol(client, this);
 
             clients.add(client);
-            List list = clients;
             System.out.println("Socket connected: " + client.getIdentifierName());
 
             new Thread(() -> {
@@ -91,16 +86,13 @@ public class Server {
         return chadchat;
     }
 
-    public List usersOnline() {
-
-        ArrayList<String> users = new ArrayList<>();
-
-
-        for (Client c : this.clients)
-           if(c.getUser() != null )
-               users.add(c.getUser().getUsername());
+    public List<String> getOnlineUsers() {
+        List<String> users = new ArrayList<>();
+        for(Client client : clients) {
+            //Make sure user is initialized...
+            if(client.getUser() != null) users.add(client.getUser().getUsername());
+        }
         return users;
-
     }
 }
 

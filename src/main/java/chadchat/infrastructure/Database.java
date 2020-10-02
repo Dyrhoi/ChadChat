@@ -15,6 +15,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class Database implements UserRepository, MessageRepository, ChannelRepository {
     // JDBC driver name and database URL
@@ -118,12 +119,6 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    //TODO: this.
-    @Override
-    public Iterable<User> findAllUsersByChannel(int id) {
-        return null;
     }
 
     @Override
@@ -243,6 +238,26 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
                 rs.getInt("channels.id"),
                 rs.getString("channels.name")
         );
+    }
+
+    @Override
+    public Iterable<Channel> findAllChannelsByUser(int userId) {
+        List<Channel> channels = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM users_channels INNER JOIN channels ON channels.id = channel WHERE user = ?;");
+            s.setInt(1, userId);
+            ResultSet rs = s.executeQuery();
+            while ( rs.next()) {
+                channels.add(loadChannel(rs));
+            }
+
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return channels;
     }
 
     @Override
