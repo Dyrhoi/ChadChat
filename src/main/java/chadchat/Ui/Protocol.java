@@ -31,11 +31,12 @@ public class Protocol implements Runnable {
         *
         * */
 
-        this.client.getOutput().println("\n \uD83D\uDCBB " + " ... Connected to Chat Room - Welcome .... " + "\uD83D\uDCBB");
+        this.client.getOutput().println("Connected to Chat Room - Welcome!  :) <3  ");
 
         User user = initUser();
         this.client.setUser(user);
         this.client.getOutput().println("Welcome: " + user.getUsername());
+       this.client.getOutput().println("Type /help for help");
 
         String input;
         while(true) {
@@ -72,7 +73,8 @@ public class Protocol implements Runnable {
 
         String[] input;
         do {
-            this.client.getOutput().println("Enter your (current or new) username and password.");
+            this.client.getOutput().println("Enter your (current or new) username and password.\n" +
+                    "Type 'username password'");
             input = this.client.getInput().nextLine().split(" ");
             if (input.length != 2) {
                 this.client.getOutput().println("Incorrect format, correct format is: username password");
@@ -132,8 +134,11 @@ public class Protocol implements Runnable {
                 return new ChannelCommand(args);
             case("help"):
                 return new HelpCommand();
+            case("online"):
+                return new OnlineCommand();
             default:
                 throw new ParseException("Could not find command: " + commandIdentifier, 0);
+
         }
 
     }
@@ -194,6 +199,48 @@ public class Protocol implements Runnable {
                             protocol.client.getOutput().println(getHelperMessage());
                         }
                         break;
+                    case("join"):
+                        if(args != null && args.length == 1) {
+                            String name = args[0];
+                            try {
+                                protocol.server.getChadchat().joinChannel(
+                                        name,
+                                        protocol.client.getUser()
+                                );
+                                protocol.client.getOutput().println("You successfully join the channel: " + name);
+                            } catch (ChannelNotFoundException e) {
+                                protocol.client.getOutput().println("The channel " + name + " does not exist\n"
+                                +"Use '/channel list' for all available channels");
+                                e.printStackTrace();
+                            } catch (UserExistsException e) {
+                                protocol.client.getOutput().println("You're already subscired to channel " + name);
+                                e.printStackTrace();
+                            }
+                        }
+                    case("leave"):
+                        if(args != null && args.length == 1) {
+                            String name = args[0];
+                            try {
+                                protocol.server.getChadchat().leaveChannel(name, protocol.client.getUser());
+                            } catch (ChannelNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (UserExistsException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                        break;
+                    case("set"):
+                        if(args != null && args.length == 1) {
+                            String name = args[0];
+                            try {
+                                protocol.server.getChadchat().findUsersByChannel(name, protocol.client.getUser());
+                                // Vi får at vide om han er i channelen
+                                // set usercurrentchannel til at være det der er bedt om
+                            } catch (ChannelNotFoundException e) {
+
+                                e.printStackTrace();
+                            }
+                        }
                     default:
                         protocol.client.getOutput().println(getHelperMessage());
                 }
@@ -216,6 +263,16 @@ public class Protocol implements Runnable {
         public void execute(Protocol protocol) {
             protocol.client.getOutput().println("Help command issued: Help");
         }
-    }
 
+    }
+        public class OnlineCommand implements Command {
+
+            @Override
+            public void execute(Protocol protocol) {
+
+                client.getOutput().println(protocol.server.usersOnline().toString());
+
+            }
+
+        }
 }

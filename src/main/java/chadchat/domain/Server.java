@@ -3,6 +3,7 @@ package chadchat.domain;
 import chadchat.API.ChadChat;
 import chadchat.Ui.Protocol;
 import chadchat.domain.message.Message;
+import chadchat.domain.user.User;
 import chadchat.infrastructure.Database;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ public class Server {
     private boolean isRunning;
     private List<Client> clients;
     private final ChadChat chadchat;
+
 
     public Server(int port) {
         Database database = new Database();
@@ -36,9 +38,9 @@ public class Server {
         return user;
  } */
 
-    public void broadcast(Client client, Message message){
+    public void broadcast(Client client, Message message) {
         for (Client loopedClient : this.clients) {
-            if(loopedClient.getUser()==null)
+            if (loopedClient.getUser() == null)
                 continue;
             loopedClient.getOutput().println(message);
         }
@@ -58,7 +60,7 @@ public class Server {
             Protocol protocol = new Protocol(client, this);
 
             clients.add(client);
-
+            List list = clients;
             System.out.println("Socket connected: " + client.getIdentifierName());
 
             new Thread(() -> {
@@ -88,5 +90,18 @@ public class Server {
     public ChadChat getChadchat() {
         return chadchat;
     }
+
+    public List usersOnline() {
+
+        ArrayList<String> users = new ArrayList<>();
+
+
+        for (Client c : this.clients)
+           if(c.getUser() != null )
+               users.add(c.getUser().getUsername());
+        return users;
+
+    }
 }
+
 

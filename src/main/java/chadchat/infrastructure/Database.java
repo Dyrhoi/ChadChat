@@ -13,6 +13,7 @@ import chadchat.domain.user.UserRepository;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class Database implements UserRepository, MessageRepository, ChannelRepository {
@@ -62,12 +63,12 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
 
     @Override
     public User findUser(String name) throws UserNotFoundException {
-        try(Connection conn = getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
                     "SELECT * FROM users WHERE username = ?;");
             s.setString(1, name);
             ResultSet rs = s.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return loadUser(rs);
             } else {
                 throw new UserNotFoundException(name);
@@ -77,6 +78,7 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         }
 
     }
+
     private User loadUser(ResultSet rs) throws SQLException {
         return new User(
                 rs.getInt("users.id"),
@@ -85,13 +87,14 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
                 rs.getBytes("users.salt"),
                 rs.getBytes("users.secret"));
     }
+
     public User findUser(int id) throws NoSuchElementException {
-        try(Connection conn = getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
                     "SELECT * FROM users WHERE id = ?;");
             s.setInt(1, id);
             ResultSet rs = s.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return loadUser(rs);
             } else {
                 System.err.println("No version in properties.");
@@ -108,7 +111,7 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
             PreparedStatement s = conn.prepareStatement("SELECT * FROM users;");
             ResultSet rs = s.executeQuery();
             ArrayList<User> items = new ArrayList<>();
-            while(rs.next()) {
+            while (rs.next()) {
                 items.add(loadUser(rs));
             }
             return items;
@@ -143,7 +146,9 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
+
                 id = rs.getInt(1);
+                joinChannel(id, 1);
             } else {
                 throw new UserExistsException(name);
             }
@@ -174,12 +179,12 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
 
     @Override
     public Message findMessage(int id) throws MessageNotFoundException {
-        try(Connection conn = getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
                     "SELECT * FROM messages WHERE id = ?;");
             s.setInt(1, id);
             ResultSet rs = s.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return loadMessage(rs);
             } else {
                 System.err.println("No version in properties.");
@@ -246,7 +251,7 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
             PreparedStatement s = conn.prepareStatement("SELECT * FROM channels;");
             ResultSet rs = s.executeQuery();
             ArrayList<Channel> items = new ArrayList<>();
-            while(rs.next()) {
+            while (rs.next()) {
                 items.add(loadChannel(rs));
             }
             return items;
@@ -257,12 +262,12 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
 
     @Override
     public Channel findChannel(int id) {
-        try(Connection conn = getConnection()) {
+        try (Connection conn = getConnection()) {
             PreparedStatement s = conn.prepareStatement(
                     "SELECT * FROM channels WHERE id = ?;");
             s.setInt(1, id);
             ResultSet rs = s.executeQuery();
-            if(rs.next()) {
+            if (rs.next()) {
                 return loadChannel(rs);
             } else {
                 System.err.println("No version in properties.");
@@ -309,4 +314,82 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         }
         return findChannel(id);
     }
+
+    @Override
+    public Channel joinChannel(int userId, int channelId) throws UserExistsException {
+        try (Connection conn = getConnection()) {
+            var ps =
+                    conn.prepareStatement(
+                            "INSERT INTO users_channels (user, channel) " +
+                                    "VALUE (?, ?);");
+            ps.setInt(1, userId);
+            ps.setInt(2, channelId);
+
+            ps.executeUpdate();
+
+        } catch (SQLException throwables) {
+
+            throw new UserExistsException("");
+
+        }
+        return findChannel(channelId);
+    }
+
+    @Override
+    public boolean leaveChannel(int userId, int channelId) {
+        boolean success = false;
+        try (Connection conn = getConnection()) {
+            var ps =
+                    conn.prepareStatement(
+                            "DELETE FROM users_channels WHERE user=? AND channel=?");
+            ps.setInt(1, userId);
+            ps.setInt(2, channelId);
+
+            ps.executeUpdate();
+            success = true;
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+      return success;
+    }
+
+    @Override
+    public Channel findChannel(String name) throws ChannelNotFoundException{
+        try (Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM channels WHERE name = ?;");
+            s.setString(1, name);
+            ResultSet rs = s.executeQuery();
+            if (rs.next()) {
+                return loadChannel(rs);
+            } else {
+                System.err.println("No version in properties.");
+                throw new ChannelNotFoundException();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Iterable<User> findUsersByChannel(int channelId) throws ChannelNotFoundException {
+        List<User> users = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM users_channels INNER JOIN users ON users.id = user WHERE channel = ?;");
+            s.setInt(1, channelId);
+            ResultSet rs = s.executeQuery();
+            while ( rs.next()) {
+                users.add( loadUser(rs));
+            }
+
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
 }
+

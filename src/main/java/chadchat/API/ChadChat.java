@@ -15,6 +15,7 @@ public class ChadChat {
     private final UserRepository users;
     private final MessageRepository messages;
     private final ChannelRepository channels;
+
     public ChadChat(UserRepository users, MessageRepository messages, ChannelRepository channels) {
         this.users = users;
         this.messages = messages;
@@ -35,7 +36,7 @@ public class ChadChat {
         User user = users.findUser(name);
         if (user.isPasswordCorrect(password)) {
             return user;
-        } else  {
+        } else {
             throw new InvalidPasswordException();
         }
     }
@@ -57,5 +58,36 @@ public class ChadChat {
         return channels.createChannel(name, user.getId());
     }
 
+    public Channel joinChannel(String name, User user) throws ChannelNotFoundException, UserExistsException {
+        int id = user.getId();
+        Channel channel = null;
 
+        channel = channels.findChannel(name);
+        channels.joinChannel(id, channel.getId());
+
+        return channel;
+    }
+
+    public boolean channelContainsUser(User user, int channelId) throws ChannelNotFoundException {
+        for (User u : channels.findUsersByChannel(channelId)) {
+            if (u.equals(user))
+                return true;
+        }
+        return false;
+    }
+
+    public Channel leaveChannel(String name, User user) throws ChannelNotFoundException, UserExistsException {
+        int id = user.getId();
+        Channel channel = null;
+
+        channel = channels.findChannel(name);
+        channels.leaveChannel(id, channel.getId());
+
+        return channel;
+    }
+
+    public boolean findUsersByChannel(String name, User user) throws ChannelNotFoundException {
+        int channelId = channels.findChannel(name).getId();
+        return channelContainsUser(user, channelId);
+    }
 }
