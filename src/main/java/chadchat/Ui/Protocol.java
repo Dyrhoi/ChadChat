@@ -41,6 +41,12 @@ public class Protocol implements Runnable {
         this.client.getOutput().println("Type /help for help");
         joinNextChannel();
 
+        /*
+        *
+        * TODO: Retrieve last 10 messages. --
+        *
+        * */
+
         String input;
         while (true) {
             input = client.getInput().nextLine();
@@ -135,6 +141,7 @@ public class Protocol implements Runnable {
             this.client.getUser().setCurrentChannel(nextChannel.getId());
             this.client.getOutput().println("You're now writing in channel: " + nextChannel.getName());
         } catch (NoSuchElementException e) {
+            this.client.getUser().setCurrentChannel(-1);
             this.client.getOutput().println("You're not in any channels, use /channel to get started.");
         }
 
