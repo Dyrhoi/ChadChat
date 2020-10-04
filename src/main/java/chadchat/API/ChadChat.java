@@ -11,6 +11,9 @@ import chadchat.domain.user.UserExistsException;
 import chadchat.domain.user.UserNotFoundException;
 import chadchat.domain.user.UserRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ChadChat {
     private final UserRepository users;
     private final MessageRepository messages;
@@ -98,5 +101,9 @@ public class ChadChat {
 
     public Channel findChannel(String name) throws ChannelNotFoundException {
         return this.channels.findChannel(name);
+    }
+
+    public Iterable<Message> findRecentMessagesForUser(User user, int amount){
+        return messages.findRecentMessagesForUser(user.getId(),amount);
     }
 }

@@ -16,4 +16,6 @@ public interface MessageRepository {
 
     Message createMessage(int userid, String message, int channelid) throws MessageNotFoundException;
 
+    Iterable<Message> findRecentMessagesForUser(int userId, int amount);
+
 }

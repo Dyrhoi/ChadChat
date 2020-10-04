@@ -12,10 +12,7 @@ import chadchat.domain.user.UserNotFoundException;
 import chadchat.domain.user.UserRepository;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 public class Database implements UserRepository, MessageRepository, ChannelRepository {
     // JDBC driver name and database URL
@@ -233,6 +230,28 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         return findMessage(id);
     }
 
+    @Override
+    public Iterable<Message> findRecentMessagesForUser(int userId, int amount) {
+        List<Message> topMessages = new ArrayList<>();
+        try (Connection conn = getConnection()) {
+            PreparedStatement s = conn.prepareStatement(
+                    "SELECT * FROM messages " +
+                            "LEFT JOIN users_channels ON messages.channel = users_channels.channel " +
+                            "WHERE users_channels.user IN (SELECT user FROM users_channels WHERE user = ? ) " +
+                            "ORDER BY _date DESC LIMIT ?");
+            s.setInt(1, userId);
+            s.setInt(2, amount);
+            ResultSet rs = s.executeQuery();
+            while (rs.next()) {
+                topMessages.add(loadMessage(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+       Collections.reverse(topMessages);
+        return topMessages;
+    }
+
     private Channel loadChannel(ResultSet rs) throws SQLException {
         return new Channel(
                 rs.getInt("channels.id"),
@@ -406,5 +425,6 @@ public class Database implements UserRepository, MessageRepository, ChannelRepos
         }
         return users;
     }
+
 }
 

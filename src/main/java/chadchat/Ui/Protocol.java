@@ -8,6 +8,7 @@ import chadchat.domain.message.Message;
 import chadchat.domain.user.User;
 import chadchat.domain.user.UserExistsException;
 import chadchat.domain.user.UserNotFoundException;
+import chadchat.infrastructure.Database;
 
 import java.text.ParseException;
 import java.util.Arrays;
@@ -18,7 +19,6 @@ public class Protocol implements Runnable {
 
     private final Client client;
     private final Server server;
-
     public Protocol(Client client, Server server) {
         this.client = client;
         this.server = server;
@@ -40,13 +40,7 @@ public class Protocol implements Runnable {
         this.client.getOutput().println("Welcome: " + user.getUsername());
         this.client.getOutput().println("Type /help for help");
         joinNextChannel();
-
-        /*
-        *
-        * TODO: Retrieve last 10 messages. --
-        *
-        * */
-
+        topMessages(10);
         String input;
         while (true) {
             input = client.getInput().nextLine();
@@ -147,6 +141,13 @@ public class Protocol implements Runnable {
 
     }
 
+    public void topMessages(int amount){
+        Iterable<Message> recentMessages = this.server.getChadchat().findRecentMessagesForUser(
+                this.client.getUser(), amount);
+        for (Message m : recentMessages) {
+            this.client.getOutput().println(m);
+        }
+    }
 
     /**
      * @Class Command : Our command executor.
